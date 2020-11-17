@@ -1,0 +1,95 @@
+{extend name='admin@/public/table_basic' /}
+
+{block name='content'}
+<div class="ibox-content">
+    <form class="form-horizontal m-t" id="commentForm" action="/admin/art/{$data.id}" method="post">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">修改描述：</label>
+            <div class="col-sm-8">
+                <input id="desn" name="desn" minlength="2" type="text" class="form-control" value="{$data.desn}">
+            </div>
+        </div>
+        {:token()}
+<!--        伪装成为put请求方式-->
+        <input type="hidden" name="_method" value="PUT">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">修改文章标题：</label>
+            <div class="col-sm-8">
+                <input id="title" class="form-control" name="title" type="text" value="{$data.title}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">修改标签：</label>
+            <div class="col-sm-8">
+                <select class="form-control" name="art_cates">
+                    {foreach $cate as $val}
+                    <!--让本来的标签处于选中状态-->
+                    <option value="{$val.id}" {if $val.id == $data.cates_id} selected {/if}>{$val.cate_name}</option>
+                    {/foreach}
+                    <!--                    <option>选项 2</option>-->
+                    <!--                    <option>选项 3</option>-->
+                    <!--                    <option>选项 4</option>-->
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">修改文章内容：</label>
+            <div class="col-sm-8">
+                <div id="div1">
+                </div>
+                <textarea id="text1" name="body" style="display: none"></textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-4 col-sm-offset-3">
+                <button class="btn btn-primary" type="submit">提交修改</button>
+            </div>
+        </div>
+    </form>
+</div>
+{/block}
+
+{block name='js'}
+<script src="/static/js/plugins/validate/jquery.validate.min.js"></script>
+<script src="/static/js/plugins/validate/messages_zh.min.js"></script>
+<script type="text/javascript" src="/static/js/wangEditor.min.js"></script>
+
+<script>
+    // $.validator.setDefaults({
+    //     submitHandler: function() {
+    //         alert("提交事件!");
+    //     }
+    // });
+
+    $(document).ready(function(){
+        $('#commentForm').validate({
+            rules: {
+                desn: 'required',
+                title: 'required',
+                body: 'required'
+            },
+            messages: {
+                desn:  '昵称不能为空！',
+                title:  '标题不能为空！',
+                body:  '内容不能为空！'
+            }
+        });
+    });
+</script>
+
+<!--富文本编辑器-->
+<script type="text/javascript">
+    const E = window.wangEditor;
+    const editor = new E('#div1');
+    const $text1 = $('#text1');
+    editor.config.onchange = function (html) {
+        // 第二步，监控变化，同步更新到 textarea
+        $text1.val(html)
+    };
+    editor.create();
+
+    // 第一步，初始化 textarea 的值
+    $text1.val(editor.txt.html(`{$data.body}`));
+</script>
+{/block}
